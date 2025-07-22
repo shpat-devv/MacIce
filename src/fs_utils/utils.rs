@@ -13,10 +13,22 @@ pub mod io_utils {
             file_handler
         }
 
-        pub fn check(&mut self){
+        pub fn check(mut self){
             for file in &self.paths{
-                
+                let (key, value) = file;
+                println!("checking for {} at path: {}", key, value);
+
+                let file = File::open(value);
+
+                let file = match file {
+                    Ok(file) => file,
+                    Err(error) => panic!("Couldn't open file. {:?}", error)
+                };
+
+                println!("{} file path valid, checking next path..", key);
+                println!("-----------------------------------------------------");
             }
+            self.check_valid = true;
         }
     }
 }
