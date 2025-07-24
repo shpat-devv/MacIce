@@ -53,7 +53,7 @@ pub mod file_handler_mod {
 
                 let file = File::open(value);
 
-                let file = match file {
+                let _file = match file {
                     Ok(file) => file,
                     Err(error) => panic!("Couldn't open file. {:?}", error)
                 };
