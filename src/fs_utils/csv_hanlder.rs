@@ -1,6 +1,9 @@
 pub mod csv_handler_mod{
     use std::fs::File;
-    
+    use std::fs::OpenOptions;
+    use std::io::Seek;
+    use std::io::SeekFrom;
+
     pub struct CsvHandler{
         pub path: String,
         pub file: File
@@ -17,10 +20,14 @@ pub mod csv_handler_mod{
             let csv_handler: CsvHandler = CsvHandler { path: (csv_path), file: (file) };
             csv_handler
         }
-        pub fn read(&self, key: String){
-            let mut csv_file: csv::Reader<&File> = csv::Reader::from_reader(&self.file);
-            let key_index = 0;
 
+        pub fn read(&self, key: String) -> bool{
+            let mut file = &self.file;
+            file.seek(SeekFrom::Start(0)).expect("Failed to seek to start of file"); //reset file every read since its a shared reference
+
+            let mut csv_file: csv::Reader<&File> = csv::Reader::from_reader(file);
+            let key_index = 0;
+         
             for result in csv_file.records(){
                 let record = match result {
                     Ok(rdr) => rdr,
@@ -28,34 +35,42 @@ pub mod csv_handler_mod{
                 };
 
                 if let Some(field) = record.get(key_index) {
-                    if field == key {
+                    if field == key{ //key from first loop iteration
                         if let Some(path) = record.get(key_index + 1) { //path index
                             println!("Found key: {}, value: {}", key, path);
                         } else {
                             println!("Key found, but no associated value.");
                         }
+                        return true; 
                     }
                 }
-            }   
+            }
+            false 
         }
 
 
-        pub fn write(&mut self, key: String, value: String) {
-            let mut csv_file = match csv::Writer::from_path(&self.path) {
-                Ok(writer) => writer,
+        pub fn write(&mut self, key: &String, value: &String) {
+            let file = match OpenOptions::new().append(true).open(&self.path) {
+                Ok(file) => file,
                 Err(error) => {
-                    eprintln!("Failed to open CSV file for writing: {}", error);
+                    println!("Failed to open CSV file for appending: {}", error);
                     return;
                 }
             };
-            let record = [key, value];
+
+            let mut csv_file = csv::Writer::from_writer(file);
+
+            let record: [&String; 2] = [&key, &value];
+
             if let Err(error) = csv_file.write_record(&record) {
-                eprintln!("Failed to write record to CSV file: {}", error);
+                println!("Failed to write record to CSV file: {}", error);
                 return;
             }
             if let Err(error) = csv_file.flush() {
-                eprintln!("Failed to flush CSV writer: {}", error);
+                println!("Failed to flush CSV writer: {}", error);
             }
         }
     }
 }
+
+//TODO: update the writer

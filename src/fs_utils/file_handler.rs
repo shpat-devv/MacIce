@@ -5,7 +5,7 @@ pub mod file_handler_mod {
     use std::io::{stdin};    
     use whoami;
     pub struct FileHandler{
-        pub paths: HashMap<String, PathBuf>,
+        pub paths: HashMap<String, String>,
         pub check_valid: bool,
     }
 
@@ -15,35 +15,24 @@ pub mod file_handler_mod {
             file_handler
         }
 
-        pub fn finder(&mut self){
+        pub fn finder(&self, possible_path: String) -> String{
             let username = whoami::username();
+            let full_path = format!("/Users/{}/{}", username, possible_path);
+            let file = PathBuf::from(&full_path);
 
-            let files_to_check: Vec<(&'static str, &'static str)> = vec![
-                ("yabai", ".config/yabai/yabairc"),
-                ("sketchybar", ".config/sketchybar/colors.lua"),
-                ("alacritty", ".config/alacritty/alacritty.toml"),
-                ("code", "Library/Application Support/Code/User/settings.json"),
-                ("firefox", "Library/Application Support/Firefox/Profiles/vct3x7mf.DownToneUi/chrome/DownToneUI/_globals.css"),
-            ];
+            if file.is_file(){
+                full_path  
+            } else {
+                let mut user_input = String::new();
 
-
-            for (key, path) in files_to_check{
-                let full_path = format!("/Users/{}/{}", username, path);
-                let file = PathBuf::from(&full_path);
-                if file.is_file(){
-                    self.paths.insert(String::from(key), file);
-                } else {
-                    let mut user_input = String::new();
-                    while user_input.is_empty(){
-                        println!("Please input {} path:", key);
-                        stdin()
-                            .read_line(&mut user_input)
-                            .expect("Couldn't read file, please try again:");
-                    }
-                    self.paths.insert(String::from(key), PathBuf::from(user_input));
+                while user_input.trim().is_empty() {
+                    println!("Please input a valid path: ");
+                    stdin()
+                        .read_line(&mut user_input)
+                        .expect("Couldn't read file, please try again:");
                 }
+                user_input.trim().to_string()
             }
-
         }
 
         pub fn check(&mut self){
@@ -63,5 +52,7 @@ pub mod file_handler_mod {
             }
             self.check_valid = true;
         }
-    }
+
+        }
+    
 }

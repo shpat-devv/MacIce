@@ -89,3 +89,12 @@ MacIce is released under the MIT License. See the `LICENSE` file for more
 details.
 
 [License](https://github.com/your-username/auto-sync-settings/blob/main/LICENSE)
+
+
+## How the code works
+--------------------
+verify the paths in the csv file.
+if not correct try checking for the possible paths.
+if possible paths are not correct ask user for the paths
+save paths onto the csv file
+manipulate data
