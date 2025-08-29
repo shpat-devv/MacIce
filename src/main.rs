@@ -1,5 +1,6 @@
 use fs_utils::file_handler::file_handler_mod::FileHandler;
 use fs_utils::csv_hanlder::csv_handler_mod::CsvHandler;
+use fs_utils::value_changer::value_chager_mod::ValueChanger;
 
 mod fs_utils;
 
@@ -25,8 +26,8 @@ fn main() {
     let mut csv_handler: CsvHandler = CsvHandler::new(String::from(CSV_PATH));
     let mut file_handler: FileHandler = FileHandler::new();
 
+    //finding and reading all the paths
     let mut program_index = 0;
-
     for program in PROGRAMS{
         println!("checking {program}");
         if !csv_handler.read(String::from(program)) {
@@ -36,4 +37,6 @@ fn main() {
         }
         program_index += 1;
     }
+
+
 }

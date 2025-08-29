@@ -1,4 +1,4 @@
-pub mod file_handler_mod {
+pub mod file_handler_mod{
     use std::collections::HashMap;
     use std::fs::File;
     use std::path::PathBuf;
