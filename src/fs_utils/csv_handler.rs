@@ -4,6 +4,9 @@ pub mod csv_handler_mod{
     use std::io::Seek;
     use std::io::SeekFrom;
 
+    use crate::enums::path_return::return_enum_mod::ReturnPath;
+
+    
     pub struct CsvHandler{
         pub path: String,
         pub file: File
@@ -21,7 +24,7 @@ pub mod csv_handler_mod{
             csv_handler
         }
 
-        pub fn read(&self, key: String) -> bool{
+        pub fn read(&self, key: &String) -> ReturnPath{
             let mut file = &self.file;
             file.seek(SeekFrom::Start(0)).expect("Failed to seek to start of file"); //reset file every read since its a shared reference
 
@@ -38,14 +41,15 @@ pub mod csv_handler_mod{
                     if field == key{ //key from first loop iteration
                         if let Some(path) = record.get(key_index + 1) { //path index
                             println!("Found key: {}, value: {}", key, path);
+                            return ReturnPath::Path(String::from(path))
                         } else {
                             println!("Key found, but no associated value.");
                         }
-                        return true; 
+                        
                     }
                 }
             }
-            false 
+            return ReturnPath::None(false)
         }
 
 
@@ -74,3 +78,4 @@ pub mod csv_handler_mod{
 }
 
 //TODO: update the writer
+//writer overwrites csv header
